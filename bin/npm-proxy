@@ -65,7 +65,8 @@ app.use(function(req, res, next){
 
       if (!last && 404 == r.statusCode) return proxy();
 
-      if (0 != type.indexOf('text/')) {
+      if (0 != type.indexOf('text/') ||
+        0 != type.indexOf('application/json')) {
         res.writeHead(r.statusCode, r.headers);
         return r.pipe(res);
       }
