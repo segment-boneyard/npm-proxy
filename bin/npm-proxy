@@ -6,6 +6,7 @@
 
 var program = require('commander');
 var express = require('express');
+var format = require('url').format;
 var parse = require('url').parse;
 var http = require('http');
 
@@ -40,10 +41,10 @@ app.use(function(req, res, next){
     var last = i == registries.length - 1;
     var registry = registries[i++];
 
-    console.log('>>>> %s %s', req.method, registry);
     var opts = parse(registry);
     opts.method = req.method;
     opts.path = req.url;
+    console.log('>>>> %s %s', req.method, format(opts));
 
     var r = http.request(opts);
 
