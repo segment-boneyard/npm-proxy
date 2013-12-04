@@ -47,6 +47,7 @@ app.use(function(req, res, next){
       || 0 == req.url.indexOf('/-/user-by-email');
 
     var opts = parse(registry);
+    opts.agent = false;
     opts.method = req.method;
 
     if (~req.url.indexOf('/registry/_design')) opts.path = req.url
