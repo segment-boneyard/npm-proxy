@@ -50,8 +50,6 @@ app.use(function(req, res, next){
       console.log('<< %s', r.statusCode);
       if (!last && 404 == r.statusCode) return proxy();
 
-      res.writeHead(r.statusCode, r.headers);
-
       var buf = '';
       r.setEncoding('utf-8');
       r.on('data', function(c){ buf += c });
@@ -59,8 +57,12 @@ app.use(function(req, res, next){
         try {
           var obj = JSON.parse(buf);
           if (first) obj = fixTarballs(obj);
-          res.end(JSON.stringify(obj, null, 2));
+          var json = JSON.stringify(obj, null, 2);
+          r.headers['content-length'] = Buffer.byteLength(json);
+          res.writeHead(r.statusCode, r.headers);
+          res.end(json);
         } catch (err) {
+          res.writeHead(r.statusCode, r.headers);
           res.end(buf);
         }
       });
