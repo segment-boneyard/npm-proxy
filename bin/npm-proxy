@@ -49,6 +49,7 @@ app.use(function(req, res, next){
 
     r.on('response', function(r){
       console.log('<< %s', r.statusCode);
+
       if (!first && !idempotent) {
         res.statusCode = 400;
         return res.end('not doing that :)');
@@ -76,9 +77,13 @@ app.use(function(req, res, next){
 
     r.on('error', function(err){
       console.error(err.stack);
-      if (!last) return proxy();
-      res.status = 500;
-      res.end('something exploded');
+
+      if (!first && !idempotent) {
+        res.statusCode = 400;
+        return res.end('not doing that :)');
+      }
+
+      proxy();
     });
 
     req.pipe(r);
