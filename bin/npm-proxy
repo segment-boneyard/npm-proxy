@@ -51,14 +51,15 @@ app.use(function(req, res, next){
     opts.path += req.url;
     console.log('>>>> %s %s', req.method, opts.host + opts.path);
 
-    var r = http.request(opts);
+    if (!first && (!idempotent || userRelated)) {
+      return res.send(400, { error: 'failed' });
+    }
+    v
+    ar r = http.request(opts);
 
     r.on('response', function(r){
       console.log('<<<< %s', r.statusCode);
 
-      if (!first && (!idempotent || userRelated)) {
-        return res.send(400, { error: 'failed' });
-      }
 
       if (!last && 404 == r.statusCode) return proxy();
 
@@ -82,12 +83,7 @@ app.use(function(req, res, next){
 
     r.on('error', function(err){
       console.error(err.stack);
-
-      if (!first && (!idempotent || userRelated)) {
-        return res.send(400, { error: 'failed' });
-      }
-
-      proxy();
+      if (!last) proxy();
     });
 
     req.pipe(r);
