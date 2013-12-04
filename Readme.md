@@ -1,7 +1,7 @@
 
 # name
 
-  description
+  super lame quick hack of a delegation proxy
 
 ## Installation
 

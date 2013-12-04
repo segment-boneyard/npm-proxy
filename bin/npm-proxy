@@ -73,7 +73,7 @@ app.use(function(req, res, next){
       res.end('something exploded');
     });
 
-    r.end();
+    req.pipe(r);
   }
 
   proxy();
