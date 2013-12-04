@@ -57,8 +57,7 @@ app.use(function(req, res, next){
       console.log('<< %s', r.statusCode);
 
       if (!first && (!idempotent || userRelated)) {
-        res.statusCode = 400;
-        return res.end('failed');
+        return res.send(400, { error: 'failed' });
       }
 
       if (!last && 404 == r.statusCode) return proxy();
@@ -85,8 +84,7 @@ app.use(function(req, res, next){
       console.error(err.stack);
 
       if (!first && (!idempotent || userRelated)) {
-        res.statusCode = 400;
-        return res.end('failed');
+        return res.send(400, { error: 'failed' });
       }
 
       proxy();
