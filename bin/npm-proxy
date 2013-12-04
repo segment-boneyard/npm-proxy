@@ -48,7 +48,8 @@ app.use(function(req, res, next){
 
     var opts = parse(registry);
     opts.method = req.method;
-    opts.path += req.url;
+
+    if (!~req.url.indexOf('/registry/_design')) opts.path += req.url;
 
     if (!first && (!idempotent || userRelated)) {
       return res.send(400, { error: 'failed' });
