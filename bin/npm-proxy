@@ -49,12 +49,12 @@ app.use(function(req, res, next){
     var opts = parse(registry);
     opts.method = req.method;
     opts.path += req.url;
-    console.log('>>>> %s %s', req.method, opts.host + opts.path);
 
     if (!first && (!idempotent || userRelated)) {
       return res.send(400, { error: 'failed' });
     }
 
+    console.log('>>>> %s %s', req.method, opts.host + opts.path);
     var r = http.request(opts);
 
     r.on('response', function(r){
