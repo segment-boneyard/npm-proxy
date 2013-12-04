@@ -53,7 +53,7 @@ app.use(function(req, res, next){
     else opts.path += req.url;
 
     if (!first && (!idempotent || userRelated)) {
-      return res.send(400, { error: 'failed' });
+      return res.send(400, { error: 'failed to fetch' });
     }
 
     console.log('>>>> %s %s', req.method, opts.host + opts.path);
