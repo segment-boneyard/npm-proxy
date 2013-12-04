@@ -43,8 +43,8 @@ app.use(function(req, res, next){
 
     var opts = parse(registry);
     opts.method = req.method;
-    opts.path = req.url;
-    console.log('>>>> %s %s', req.method, format(opts));
+    opts.path += req.url;
+    console.log('>>>> %s %s', req.method, opts.host + opts.path);
 
     var r = http.request(opts);
 
