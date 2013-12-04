@@ -5,7 +5,8 @@
   "description": "",
   "keywords": [],
   "dependencies": {
-    "commander": "~2.1.0"
+    "commander": "~2.1.0",
+    "express": "~3.4.6"
   },
   "bin": {
     "npm-proxy": "bin/npm-proxy"
