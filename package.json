@@ -1,13 +1,16 @@
 {
-  "name": "<name>",
+  "name": "npm-proxy",
   "version": "0.0.1",
-  "repository": "visionmedia/<name>",
+  "repository": "visionmedia/npm-proxy",
   "description": "",
   "keywords": [],
   "dependencies": {},
+  "bin": {
+    "npm-proxy": "bin/npm-proxy"
+  },
   "devDependencies": {
     "mocha": "*",
-    "should": "*"  
+    "should": "*"
   },
   "license": "MIT"
 }
