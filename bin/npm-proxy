@@ -12,18 +12,17 @@ var http = require('http');
 // parse
 
 program
-  .option('-r, --registry <url>', 'registry address')
+  .usage('[options] <registry-url ...>')
   .option('-p, --port <port>', 'port to listen on [3333]', '3333')
   .option('-u, --url <url>', 'registry url `ex: https://registry.segment.io`')
   .parse(process.argv);
 
 // options
 
-var registry = parse(program.registry);
+var registries = program.args;
+if (!registries.length) throw new Error('<registries> required');
 var port = parseInt(program.port, 10);
 var url = program.url;
-
-if (!registry) throw new Error('--registry required');
 
 // app
 
@@ -33,38 +32,51 @@ var app = express();
 
 app.use(function(req, res, next){
   console.log('>> %s %s', req.method, req.url);
+  var i = 0;
 
-  var opts = { method: 'GET' };
-  for (var k in registry) opts[k] = registry[k];
-  opts.path = req.url;
-  var req = http.request(opts);
+  function proxy() {
+    var first = i == 0;
+    var last = i == registries.length - 1;
+    var registry = registries[i++];
 
-  req.on('response', function(r){
-    console.log('<< %s', r.statusCode);
+    console.log('try %s', registry);
+    var opts = parse(registry);
+    opts.method = req.method;
+    opts.path = req.url;
 
-    res.writeHead(r.statusCode, r.headers);
+    var r = http.request(opts);
 
-    var buf = '';
-    r.setEncoding('utf-8');
-    r.on('data', function(c){ buf += c });
-    r.on('end', function(){
-      try {
-        var obj = JSON.parse(buf);
-        obj = fixTarballs(obj); // TODO: first only
-        res.end(JSON.stringify(obj, null, 2));
-      } catch (err) {
-        res.end(buf);
-      }
+    r.on('response', function(r){
+      console.log('<< %s', r.statusCode);
+      if (!last && 404 == r.statusCode) return proxy();
+
+      res.writeHead(r.statusCode, r.headers);
+
+      var buf = '';
+      r.setEncoding('utf-8');
+      r.on('data', function(c){ buf += c });
+      r.on('end', function(){
+        try {
+          var obj = JSON.parse(buf);
+          if (first) obj = fixTarballs(obj);
+          res.end(JSON.stringify(obj, null, 2));
+        } catch (err) {
+          res.end(buf);
+        }
+      });
     });
-  });
 
-  req.on('error', function(err){
-    console.error(err.stack);
-    res.status = 500;
-    res.end('something exploded');
-  });
+    r.on('error', function(err){
+      console.error(err.stack);
+      if (!last) return proxy();
+      res.status = 500;
+      res.end('something exploded');
+    });
 
-  req.end();
+    r.end();
+  }
+
+  proxy();
 });
 
 // lame shit to fix tarballs
