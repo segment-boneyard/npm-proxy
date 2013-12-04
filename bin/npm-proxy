@@ -54,7 +54,7 @@ app.use(function(req, res, next){
     var r = http.request(opts);
 
     r.on('response', function(r){
-      console.log('<< %s', r.statusCode);
+      console.log('<<<< %s', r.statusCode);
 
       if (!first && (!idempotent || userRelated)) {
         return res.send(400, { error: 'failed' });
