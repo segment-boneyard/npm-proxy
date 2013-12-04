@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+/**
+ * Module dependencies.
+ */
+
+var program = require('commander');
+var express = require('express');
+var parse = require('url').parse;
+var http = require('http');
+
+// parse
+
+program
+  .option('-r, --registry <url>', 'registry address')
+  .option('-p, --port <port>', 'port to listen on [3333]', '3333')
+  .option('-u, --url <url>', 'registry url `ex: https://registry.segment.io`')
+  .parse(process.argv);
+
+// options
+
+var registry = parse(program.registry);
+var port = parseInt(program.port, 10);
+var url = program.url;
+
+if (!registry) throw new Error('--registry required');
+
+// app
+
+var app = express();
+
+// proxy
+
+app.use(function(req, res, next){
+  console.log('>> %s %s', req.method, req.url);
+
+  var opts = { method: 'GET' };
+  for (var k in registry) opts[k] = registry[k];
+  opts.path = req.url;
+  var req = http.request(opts);
+
+  req.on('response', function(r){
+    console.log('<< %s', r.statusCode);
+
+    res.writeHead(r.statusCode, r.headers);
+
+    var buf = '';
+    r.setEncoding('utf-8');
+    r.on('data', function(c){ buf += c });
+    r.on('end', function(){
+      try {
+        var obj = JSON.parse(buf);
+        obj = fixTarballs(obj); // TODO: first only
+        res.end(JSON.stringify(obj, null, 2));
+      } catch (err) {
+        res.end(buf);
+      }
+    });
+  });
+
+  req.on('error', function(err){
+    console.error(err.stack);
+    res.status = 500;
+    res.end('something exploded');
+  });
+
+  req.end();
+});
+
+// lame shit to fix tarballs
+
+function fixTarballs(obj) {
+  for (var k in obj.versions) {
+    var ver = obj.versions[k];
+    var tar = parse(ver.dist.tarball);
+    ver.dist.tarball = url + tar.path;
+  }
+
+  return obj;
+}
+
+// listen
+
+app.listen(port);
+console.log('listening on port %s', port);

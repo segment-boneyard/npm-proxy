@@ -4,7 +4,9 @@
   "repository": "visionmedia/npm-proxy",
   "description": "",
   "keywords": [],
-  "dependencies": {},
+  "dependencies": {
+    "commander": "~2.1.0"
+  },
   "bin": {
     "npm-proxy": "bin/npm-proxy"
   },
