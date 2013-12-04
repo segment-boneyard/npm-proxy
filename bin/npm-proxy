@@ -42,9 +42,9 @@ app.use(function(req, res, next){
     var registry = registries[i++];
 
     var userRelated = 0 == req.url.indexOf('/-/user')
-      || req.url.indexOf('/_users')
-      || req.url.indexOf('/publish_users')
-      || req.url.indexOf('/-/user-by-email');
+      || 0 == req.url.indexOf('/_users')
+      || 0 == req.url.indexOf('/publish_users')
+      || 0 == req.url.indexOf('/-/user-by-email');
 
     var opts = parse(registry);
     opts.method = req.method;
