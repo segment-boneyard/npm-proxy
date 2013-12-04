@@ -33,7 +33,7 @@ var app = express();
 
 app.use(function(req, res, next){
   var idempotent = 'HEAD' == req.method || 'GET' == req.method;
-  console.log('>> %s %s', req.method, req.url);
+  console.log('\n>> %s %s', req.method, req.url);
   var i = 0;
 
   function proxy() {
