@@ -31,6 +31,7 @@ var app = express();
 // proxy
 
 app.use(function(req, res, next){
+  var idempotent = 'HEAD' == req.method || 'GET' == req.method;
   console.log('>> %s %s', req.method, req.url);
   var i = 0;
 
@@ -48,6 +49,7 @@ app.use(function(req, res, next){
 
     r.on('response', function(r){
       console.log('<< %s', r.statusCode);
+      if (!first && !idempotent) return res.end('not doing that :)');
       if (!last && 404 == r.statusCode) return proxy();
 
       var buf = '';
