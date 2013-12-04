@@ -61,7 +61,7 @@ app.use(function(req, res, next){
     var r = http.request(opts);
 
     r.on('response', function(r){
-      console.log('<<<< %s', r.statusCode);
+      console.log('<<<< %s %s %s', r.statusCode, req.method, opts.host + opts.path);
       var type = r.headers['content-type'] || '';
 
       if (!last && 404 == r.statusCode) return proxy();
