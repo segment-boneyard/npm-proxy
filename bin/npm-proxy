@@ -61,9 +61,14 @@ app.use(function(req, res, next){
 
     r.on('response', function(r){
       console.log('<<<< %s', r.statusCode);
-
+      var type = r.headers['content-type'] || '';
 
       if (!last && 404 == r.statusCode) return proxy();
+
+      if (0 != type.indexOf('text/')) {
+        res.writeHead(r.statusCode, r.headers);
+        return r.pipe(res);
+      }
 
       var buf = '';
       r.setEncoding('utf-8');
