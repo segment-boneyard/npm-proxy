@@ -41,6 +41,11 @@ app.use(function(req, res, next){
     var last = i == registries.length - 1;
     var registry = registries[i++];
 
+    var userRelated = 0 == req.url.indexOf('/-/user')
+      || req.url.indexOf('/_users')
+      || req.url.indexOf('/publish_users')
+      || req.url.indexOf('/-/user-by-email');
+
     var opts = parse(registry);
     opts.method = req.method;
     opts.path += req.url;
@@ -51,7 +56,7 @@ app.use(function(req, res, next){
     r.on('response', function(r){
       console.log('<< %s', r.statusCode);
 
-      if (!first && !idempotent) {
+      if (!first && (!idempotent || userRelated)) {
         res.statusCode = 400;
         return res.end('failed');
       }
@@ -79,7 +84,7 @@ app.use(function(req, res, next){
     r.on('error', function(err){
       console.error(err.stack);
 
-      if (!first && !idempotent) {
+      if (!first && (!idempotent || userRelated)) {
         res.statusCode = 400;
         return res.end('failed');
       }
