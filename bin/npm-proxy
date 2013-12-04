@@ -52,7 +52,7 @@ app.use(function(req, res, next){
 
       if (!first && !idempotent) {
         res.statusCode = 400;
-        return res.end('not doing that :)');
+        return res.end('failed');
       }
 
       if (!last && 404 == r.statusCode) return proxy();
@@ -80,7 +80,7 @@ app.use(function(req, res, next){
 
       if (!first && !idempotent) {
         res.statusCode = 400;
-        return res.end('not doing that :)');
+        return res.end('failed');
       }
 
       proxy();
