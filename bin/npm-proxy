@@ -40,7 +40,7 @@ app.use(function(req, res, next){
     var last = i == registries.length - 1;
     var registry = registries[i++];
 
-    console.log('try %s', registry);
+    console.log('>>>> %S %s', req.method, registry);
     var opts = parse(registry);
     opts.method = req.method;
     opts.path = req.url;
@@ -49,7 +49,11 @@ app.use(function(req, res, next){
 
     r.on('response', function(r){
       console.log('<< %s', r.statusCode);
-      if (!first && !idempotent) return res.end('not doing that :)');
+      if (!first && !idempotent) {
+        res.statusCode = 400;
+        return res.end('not doing that :)');
+      }
+
       if (!last && 404 == r.statusCode) return proxy();
 
       var buf = '';
