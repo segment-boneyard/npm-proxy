@@ -104,10 +104,17 @@ app.use(function(req, res, next){
 // lame shit to fix tarballs
 
 function fixTarballs(obj) {
-  for (var k in obj.versions) {
-    var ver = obj.versions[k];
-    var tar = parse(ver.dist.tarball);
-    ver.dist.tarball = url + tar.path;
+  if (obj.dist) {
+    var tar = parse(obj.dist.tarball);
+    obj.dist.tarball = url + tar.path;
+  }
+
+  if (obj.versions) {
+    for (var k in obj.versions) {
+      var ver = obj.versions[k];
+      var tar = parse(ver.dist.tarball);
+      ver.dist.tarball = url + tar.path;
+    }
   }
 
   return obj;
